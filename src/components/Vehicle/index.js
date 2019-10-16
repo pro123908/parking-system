@@ -7,7 +7,7 @@ import VehiclesList from "./VehiclesList";
 import { addVehicle, clearVehicle } from "../../actions";
 
 const Vehicles = ({ vehicles, addVehicle, clearVehicle }) => {
-  console.log("Rending FAIN");
+  // console.log("Rending FAIN");
   return (
     <Container maxWidth="sm">
       <AddVehicle

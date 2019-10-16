@@ -5,7 +5,12 @@ import { connect } from "react-redux";
 
 import CustomDialog from "../Dialogs";
 import { TIMER_FOR_PARKING_LOT } from "../../config";
-import { addVehicle, clearVehicle } from "../../actions";
+import {
+  addVehicle,
+  clearVehicle,
+  calMinTime,
+  setParkingInfo
+} from "../../actions";
 import TimeFormat from "../functions/TimeFormat";
 
 const AddVehicle = props => {
@@ -19,9 +24,78 @@ const AddVehicle = props => {
 
   const [dialogText, setDialogText] = useState({});
 
+  const [minTimer, setMinTimer] = useState(null);
+
+  const [dialogTimer, setDialogTimer] = useState(5);
+
+  const minCounter = () => {
+    if (props.vehicles.limit && open) {
+      // Setting the timer for the first time
+      if (minTimer === null) setMinTimer(props.vehicles.minTime);
+
+      // Returning empty function if timer has been ended
+      if (minTimer === 0) {
+        console.log("Timer => 0");
+        if (open) {
+          modalClose();
+          dialogTextString("available");
+          modalOpen();
+        }
+        return () => {};
+      }
+      const intervalId = setInterval(() => {
+        setMinTimer(minTimer - 1);
+      }, 1000);
+
+      // console.log(intervalId);
+
+      dialogTextString("failure");
+
+      // clear interval on re-render to avoid memory leaks
+      return () => {
+        // console.log("Clearing id ", intervalId);
+        clearInterval(intervalId);
+      };
+    }
+  };
+
+  const dialogCounter = () => {
+    // Returning empty function if timer has been ended
+    if (dialogTimer === 0) {
+      modalClose();
+      // console.log("closing");
+      return () => {};
+    }
+    const intervalId = setInterval(() => {
+      setDialogTimer(dialogTimer - 1);
+    }, 1000);
+
+    // clear interval on re-render to avoid memory leaks
+    return () => {
+      // console.log("Clearing id ", intervalId);
+      clearInterval(intervalId);
+    };
+  };
+
+  // useEffect(() => {
+  //   console.log("what ise ee");
+  //   return props.setParkingInfo(props.vehicles);
+  // }, [props.vehicles.LotsLength]);
+
   useEffect(() => {
-    if (props.vehicles.limit) dialogTextString("failure");
-  }, [props]);
+    if (props.vehicles.limit) {
+      return minCounter();
+    }
+
+    return () => {};
+  }, [props, minTimer]);
+
+  useEffect(() => {
+    if (open) {
+      // console.log("caled");
+      return dialogCounter();
+    }
+  }, [open, dialogTimer]);
 
   const resetInputs = () => {
     setVehicle({ driverName: "", registrationNumber: "" });
@@ -45,7 +119,7 @@ const AddVehicle = props => {
       vehicle.time = new Date().getTime();
 
       // Adding vehicle to the parkingLot
-      props.addVehicle(vehicle);
+      props.addVehicle(vehicle, props.vehicles);
 
       // Resetting all the inputs
       resetInputs();
@@ -87,8 +161,13 @@ const AddVehicle = props => {
       setDialogText({
         title: "Parking Information",
         description: `No parking space available at this moment! Next parking lot will be available in ${TimeFormat(
-          props.vehicles.minTime * 1000
+          minTimer * 1000
         )}`
+      });
+    } else if (type === "available") {
+      setDialogText({
+        title: "Parking Information",
+        description: `Parking Space is now available`
       });
     }
   };
@@ -160,5 +239,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { addVehicle, clearVehicle }
+  { addVehicle, clearVehicle, calMinTime, setParkingInfo }
 )(AddVehicle);
