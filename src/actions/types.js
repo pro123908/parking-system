@@ -6,3 +6,7 @@ export const GET_VEHICLES = "GET_VEHICLES";
 
 export const SET_PARKING_INFO = "SET_PARKING_INFO";
 export const GET_PARKING_INFO = "GET_PARKING_INFO";
+
+export const SET_LIMIT = "SET_LIMIT";
+
+export const SET_LOADING = "SET_LOADING";

@@ -1,7 +1,6 @@
 import { TIMER_FOR_PARKING_LOT } from "../../config";
-import { clearVehicle } from "../../actions";
 
-export default (vehicles, clearVehicle) => {
+export default (vehicles, clearVehicle, setParkingInfo, parkingInfo) => {
   return vehicles.map(vehicle => {
     // console.log(vehicle);
     let timer = Math.round(
@@ -16,6 +15,8 @@ export default (vehicles, clearVehicle) => {
       vehicle.timer = setTimeout(() => {
         // console.log(`Timer for driver ${vehicle.driverName} expired`);
         clearVehicle(vehicle.id);
+
+        setParkingInfo(parkingInfo);
       }, timer);
     }
 

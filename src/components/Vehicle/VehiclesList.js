@@ -1,19 +1,35 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import Vehicle from "./Vehicle";
-import { List } from "@material-ui/core";
+import { List, CircularProgress } from "@material-ui/core";
 import { connect } from "react-redux";
 import { getAllVehicles } from "../../actions";
 
 const VehiclesList = props => {
-  // console.log("Vehicle List => ", props);
+  const [show, setShow] = useState("indeterminate");
 
-  let vehicleContent = props.vehicles.parkingLots.map(vehicle => (
-    <Vehicle key={vehicle.id} vehicle={vehicle} />
-  ));
+  useEffect(() => {
+    if (props.vehicles.parkingLots.length > 0) {
+      setShow("determinate");
+    } else {
+      setShow("indeterminate");
+    }
+  }, [props.vehicles.parkingLots]);
 
-  // console.log("Vehicle content => ", vehicleContent);
-  vehicleContent =
-    vehicleContent.length === 0 ? <h3>No Vehicles to show</h3> : vehicleContent;
+  let vehicleContent = "";
+
+  if (props.vehicles.loading) {
+    vehicleContent = (
+      <div style={{ textAlign: "center" }}>
+        <CircularProgress color="primary" variant={show} />
+      </div>
+    );
+  } else if (props.vehicles.parkingLots.length > 0) {
+    vehicleContent = props.vehicles.parkingLots.map(vehicle => (
+      <Vehicle key={vehicle.id} vehicle={vehicle} />
+    ));
+  } else {
+    vehicleContent = "No vehicle found";
+  }
 
   return <List>{vehicleContent}</List>;
 };

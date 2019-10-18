@@ -5,8 +5,6 @@ import { BrowserRouter, Route } from "react-router-dom";
 import AddVehicle from "./Vehicle/AddVehicle";
 import VehiclesList from "./Vehicle/VehiclesList";
 import Header from "./Header";
-import Login from "./Auth/login";
-import setVehiclesTimeout from "./functions/setVehiclesTimeout";
 import { connect } from "react-redux";
 import {
   getAllVehicles,
@@ -17,16 +15,23 @@ import {
 
 const App = props => {
   useEffect(() => {
-    // console.log("App effect ran");
+    let parkingInfo = {
+      LotsLength: props.vehicles.LotsLength,
+      minTime: props.vehicles.minTime,
+      limit: props.vehicles.limit
+    };
 
-    props.getAllVehicles(props.clearVehicle);
-    props.getParkingInfo();
+    props.getAllVehicles(props.clearVehicle, props.setParkingInfo, parkingInfo);
   }, []);
 
-  // useEffect(() => {
-  //   console.log("App effect run");
-  //   // return props.setParkingInfo(props.vehicles);
-  // }, [props.vehicles.LotsLength]);
+  useEffect(() => {
+    props.getParkingInfo();
+  }, [props.vehicles.loading]);
+
+  useEffect(() => {
+    if (props.vehicles.getParkingInfo)
+      return props.setParkingInfo(props.vehicles);
+  }, [props.vehicles.limit]);
 
   return (
     <div style={styles}>
@@ -35,7 +40,6 @@ const App = props => {
         <Container style={{ marginTop: 20 }}>
           <Route path="/vehicle/add" component={AddVehicle} />
           <Route path="/vehicle/list" component={VehiclesList} />
-          <Route path="/login" component={Login} />
         </Container>
       </BrowserRouter>
     </div>

@@ -25,8 +25,6 @@ const Vehicle = ({ vehicle }) => {
       setTimeLeft(timeLeft - 1);
     }, 1000);
 
-    // console.log(intervalId);
-
     // clear interval on re-render to avoid memory leaks
     return () => {
       // console.log("Clearing id ", intervalId);
@@ -35,8 +33,6 @@ const Vehicle = ({ vehicle }) => {
     // add timeLeft as a dependency to re-rerun the effect
     // when we update it
   }, [timeLeft]);
-
-  // console.log("Rendering....");
 
   return (
     <ListItem divider={true}>

@@ -4,11 +4,12 @@ import {
   CAL_MIN_TIME,
   GET_VEHICLES,
   SET_PARKING_INFO,
-  GET_PARKING_INFO
+  GET_PARKING_INFO,
+  SET_LIMIT,
+  SET_LOADING
 } from "../actions/types";
-import { PARKING_LOTS_LIMIT, TIMER_FOR_PARKING_LOT } from "../config";
+import { PARKING_LOTS_LIMIT } from "../config";
 import LeastVehicleTime from "../components/functions/LeastVehicleTime";
-import uuid from "uuid";
 
 const initialState = {
   parkingLots: [
@@ -41,79 +42,88 @@ const initialState = {
   LotsLength: 0,
   limit: false,
   minTime: false,
-  recordAdded: false
+  loading: false,
+  getParkingInfo: false
 };
 
-const calculateMinTime = (state, action) => {
-  let prevState = { ...state };
+const calculateMinTime = state => {
+  let nextState = { ...state };
 
-  prevState.minTime = LeastVehicleTime(prevState.parkingLots);
+  nextState.minTime = LeastVehicleTime(nextState.parkingLots);
 
-  return prevState;
+  return nextState;
+};
+
+const setLimit = state => {
+  let nextState = { ...state };
+
+  nextState.limit = true;
+  nextState.minTime = LeastVehicleTime(nextState.parkingLots);
+
+  return nextState;
 };
 
 const addVehicle = (state, action) => {
   action.payload.timeout = true;
 
-  let prevState = { ...state };
+  let nextState = { ...state };
 
-  if (prevState.LotsLength < prevState.LotsMax) {
-    prevState.parkingLots.push(action.payload);
-    prevState.LotsLength++;
-    prevState.recordAdded = !prevState.recordAdded;
-  } else {
-    prevState.limit = true;
-    prevState.minTime = LeastVehicleTime(prevState.parkingLots);
-  }
+  nextState.parkingLots.push(action.payload);
+  nextState.LotsLength++;
 
-  return prevState;
+  return nextState;
 };
 
 const clearVehicle = (state, action) => {
-  // console.log("ID => ", action.payload);
-
-  let prevState = { ...state };
-  let currentElement = prevState.parkingLots.findIndex(
+  let nextState = { ...state };
+  let currentElement = nextState.parkingLots.findIndex(
     ele => ele.id === action.payload
   );
-  // console.log(currentElement);
-  if (currentElement !== -1) {
-    // console.log(prevState.parkingLots[currentElement]);
-    prevState.parkingLots.splice(currentElement, 1);
 
-    prevState.LotsLength--;
-    prevState.minTime = false;
-    prevState.limit = false;
-    prevState.recordAdded = !prevState.recordAdded;
-    // console.log("after change => ", prevState);
+  if (currentElement !== -1) {
+    nextState.parkingLots.splice(currentElement, 1);
+    nextState.LotsLength--;
+    nextState.minTime = false;
+    nextState.limit = false;
   }
 
-  return prevState;
+  return nextState;
 };
 
 const getAllVehicles = (state, action) => {
-  let prevState = { ...state };
+  let nextState = { ...state };
 
-  prevState.parkingLots = action.payload;
+  nextState.parkingLots = action.payload;
 
-  return prevState;
+  return nextState;
 };
 
-const setParkingInfo = (state, action) => {
-  let prevState = { ...state };
+const setParkingInfo = state => {
+  let nextState = { ...state };
 
-  prevState.recordAdded = !prevState.recordAdded;
-  return prevState;
+  return nextState;
 };
 
 const getParkingInfo = (state, action) => {
-  let prevState = { ...state };
+  let nextState = { ...state };
 
-  prevState = { ...prevState, ...action.payload };
+  nextState = { ...nextState, ...action.payload };
 
-  // console.log("xxxxxxxxxxxxxxxxxxx : -? ", prevState);
+  nextState.getParkingInfo = true;
 
-  return prevState;
+  return nextState;
+};
+
+const setLoading = (state, action) => {
+  let newState = { ...state };
+
+  if (action.payload) {
+    newState.loading = true;
+  } else {
+    newState.loading = false;
+  }
+
+  return newState;
 };
 
 export default (state = initialState, action) => {
@@ -135,6 +145,12 @@ export default (state = initialState, action) => {
 
     case GET_PARKING_INFO:
       return getParkingInfo(state, action);
+
+    case SET_LIMIT:
+      return setLimit(state, action);
+
+    case SET_LOADING:
+      return setLoading(state, action);
 
     default:
       return state;

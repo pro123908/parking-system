@@ -9,7 +9,8 @@ import {
   addVehicle,
   clearVehicle,
   calMinTime,
-  setParkingInfo
+  setParkingInfo,
+  setLimit
 } from "../../actions";
 import TimeFormat from "../functions/TimeFormat";
 
@@ -77,11 +78,6 @@ const AddVehicle = props => {
     };
   };
 
-  // useEffect(() => {
-  //   console.log("what ise ee");
-  //   return props.setParkingInfo(props.vehicles);
-  // }, [props.vehicles.LotsLength]);
-
   useEffect(() => {
     if (props.vehicles.limit) {
       return minCounter();
@@ -102,34 +98,48 @@ const AddVehicle = props => {
   };
 
   const onSubmit = e => {
-    const errors = {};
     e.preventDefault();
 
     if (vehicle.driverName && vehicle.registrationNumber) {
-      // Giving unique ID to the vehicle
-      vehicle.id = v4();
+      let { LotsLength, LotsMax, minTime, limit } = props.vehicles;
 
-      // Attaching timeout function to the vehicle
-      vehicle.timer = setTimeout(() => {
-        // console.log(`Timer for driver ${vehicle.driverName} expired`);
+      if (LotsLength < LotsMax) {
+        // Giving unique ID to the vehicle
+        vehicle.id = v4();
 
-        if (vehicle.timeout) props.clearVehicle(vehicle.id);
-      }, TIMER_FOR_PARKING_LOT * 1000);
+        // Attaching timeout function to the vehicle
+        vehicle.timer = setTimeout(() => {
+          // console.log(`Timer for driver ${vehicle.driverName} expired`);
 
-      vehicle.time = new Date().getTime();
+          if (vehicle.timeout) props.clearVehicle(vehicle.id);
+        }, TIMER_FOR_PARKING_LOT * 1000);
 
-      // Adding vehicle to the parkingLot
-      props.addVehicle(vehicle, props.vehicles);
+        vehicle.time = new Date().getTime();
+
+        // Adding vehicle to the parkingLot
+
+        props.addVehicle(vehicle, props.vehicles);
+
+        props.setParkingInfo({ LotsLength: LotsLength + 1, limit, minTime });
+
+        // Displaying success modal text
+        dialogTextString("success");
+      } else {
+        console.log("limit");
+        props.setLimit();
+      }
 
       // Resetting all the inputs
       resetInputs();
-
-      // Displaying success modal text
-      dialogTextString("success");
-
       // Opening the modal
       modalOpen();
+    } else {
+      checkErrors();
     }
+  };
+
+  const checkErrors = () => {
+    const errors = {};
     if (!vehicle.driverName) {
       errors.driverName = "Driver Name is required!";
     }
@@ -145,8 +155,6 @@ const AddVehicle = props => {
   const modalClose = () => setOpen(false);
 
   const onChange = e => {
-    // console.log(e.target.name);
-
     setVehicle({ ...vehicle, [e.target.name]: e.target.value });
     setError({ ...error, [e.target.name]: null });
   };
@@ -239,5 +247,5 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { addVehicle, clearVehicle, calMinTime, setParkingInfo }
+  { addVehicle, clearVehicle, calMinTime, setParkingInfo, setLimit }
 )(AddVehicle);
