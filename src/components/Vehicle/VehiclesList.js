@@ -7,6 +7,8 @@ import { getAllVehicles } from "../../actions";
 const VehiclesList = props => {
   const [show, setShow] = useState("indeterminate");
 
+  console.log("Entering vehilces list");
+
   useEffect(() => {
     if (props.vehicles.parkingLots.length > 0) {
       setShow("determinate");

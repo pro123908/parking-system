@@ -12,6 +12,11 @@ import {
   setParkingInfo,
   getParkingInfo
 } from "../actions";
+import Admin from "./Auth/Admin";
+import PrivateRoute from "../components/Auth/PrivateRoute";
+import NonAuthRoute from "../components/Auth/NonAuthRoute";
+
+import Auth from "../components/Auth/Auth";
 
 const App = props => {
   useEffect(() => {
@@ -33,13 +38,20 @@ const App = props => {
       return props.setParkingInfo(props.vehicles);
   }, [props.vehicles.limit]);
 
+  useEffect(() => {
+    console.log("Auth state -> App > ", Auth.isAuthenticated());
+  });
+
   return (
     <div style={styles}>
       <BrowserRouter>
         <Header />
         <Container style={{ marginTop: 20 }}>
           <Route path="/vehicle/add" component={AddVehicle} />
-          <Route path="/vehicle/list" component={VehiclesList} />
+
+          <PrivateRoute path="/vehicle/list" component={VehiclesList} />
+
+          <NonAuthRoute path="/admin" component={Admin} />
         </Container>
       </BrowserRouter>
     </div>

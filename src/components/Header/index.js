@@ -1,8 +1,13 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
+import { connect } from "react-redux";
+import { withRouter } from "react-router-dom";
 
+import Auth from "../../components/Auth/Auth";
+
+import { setAuth } from "../../actions";
 const useStyles = makeStyles(theme => ({
   root: {
     flexGrow: 1
@@ -16,6 +21,9 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Header = props => {
+  useEffect(() => {
+    console.log("Props in header => ", props);
+  });
   const classes = useStyles();
   return (
     <div className={classes.root}>
@@ -27,13 +35,46 @@ const Header = props => {
           <Button component={Link} to="/vehicle/add" style={{ color: "#fff" }}>
             Add Vehicle
           </Button>
-          <Button component={Link} to="/vehicle/list" style={{ color: "#fff" }}>
-            Vehicle List
-          </Button>
+          {props.isAuthenticated ? (
+            <React.Fragment>
+              <Button
+                component={Link}
+                to="/vehicle/list"
+                style={{ color: "#fff" }}
+              >
+                Vehicle List
+              </Button>
+
+              <Button
+                onClick={() => {
+                  props.setAuth(false);
+                  props.history.push("/admin");
+                }}
+                style={{ color: "#fff" }}
+              >
+                Logout
+              </Button>
+            </React.Fragment>
+          ) : (
+            <Button component={Link} to="/admin" style={{ color: "#fff" }}>
+              Admin View
+            </Button>
+          )}
         </Toolbar>
       </AppBar>
     </div>
   );
 };
 
-export default Header;
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.vehicles.isAuthenticated
+  };
+};
+
+export default withRouter(
+  connect(
+    mapStateToProps,
+    { setAuth }
+  )(Header)
+);

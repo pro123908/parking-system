@@ -10,3 +10,5 @@ export const GET_PARKING_INFO = "GET_PARKING_INFO";
 export const SET_LIMIT = "SET_LIMIT";
 
 export const SET_LOADING = "SET_LOADING";
+
+export const SET_AUTH = "SET_AUTH";

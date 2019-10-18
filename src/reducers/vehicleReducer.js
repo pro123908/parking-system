@@ -6,7 +6,8 @@ import {
   SET_PARKING_INFO,
   GET_PARKING_INFO,
   SET_LIMIT,
-  SET_LOADING
+  SET_LOADING,
+  SET_AUTH
 } from "../actions/types";
 import { PARKING_LOTS_LIMIT } from "../config";
 import LeastVehicleTime from "../components/functions/LeastVehicleTime";
@@ -43,7 +44,8 @@ const initialState = {
   limit: false,
   minTime: false,
   loading: false,
-  getParkingInfo: false
+  getParkingInfo: false,
+  isAuthenticated: false
 };
 
 const calculateMinTime = state => {
@@ -126,6 +128,14 @@ const setLoading = (state, action) => {
   return newState;
 };
 
+const setAuth = (state, action) => {
+  let newState = { ...state };
+
+  newState.isAuthenticated = action.payload;
+
+  return newState;
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case ADD_VEHICLE:
@@ -151,6 +161,9 @@ export default (state = initialState, action) => {
 
     case SET_LOADING:
       return setLoading(state, action);
+
+    case SET_AUTH:
+      return setAuth(state, action);
 
     default:
       return state;

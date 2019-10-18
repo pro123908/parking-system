@@ -6,7 +6,8 @@ import {
   SET_PARKING_INFO,
   GET_PARKING_INFO,
   SET_LIMIT,
-  SET_LOADING
+  SET_LOADING,
+  SET_AUTH
 } from "./types";
 import firebase from "../components/Firebase";
 import setVehiclesTimeout from "../components/functions/setVehiclesTimeout";
@@ -127,3 +128,6 @@ export const setLimit = () => dispatch => dispatch({ type: SET_LIMIT });
 export const calMinTime = () => dispatch => dispatch({ type: CAL_MIN_TIME });
 
 const setLoading = flag => ({ type: SET_LOADING, payload: flag });
+
+export const setAuth = flag => dispatch =>
+  dispatch({ type: SET_AUTH, payload: flag });
