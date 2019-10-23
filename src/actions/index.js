@@ -7,7 +7,10 @@ import {
   GET_PARKING_INFO,
   SET_LIMIT,
   SET_LOADING,
-  SET_AUTH
+  SET_AUTH,
+  SET_VEHICLES_TIMEOUT,
+  ADD_PARKING,
+  SET_PARKING_LOTS
 } from "./types";
 import firebase from "../components/Firebase";
 import setVehiclesTimeout from "../components/functions/setVehiclesTimeout";
@@ -31,24 +34,45 @@ export const addVehicle = vehicle => async dispatch => {
   }
 };
 
-export const clearVehicle = id => async dispatch => {
+export const clearVehicle = vehicle => async dispatch => {
   // Getting the specified vehicle on database
-  let newVehicleRef = realTimeDB.ref(`vehicles/${id}`);
+  let newVehicleRef = realTimeDB.ref(`vehicles/${vehicle.id}`);
+
+  dispatch(setLoading());
 
   try {
     // Removing that vehicle from the database
     await newVehicleRef.remove();
-    dispatch({ type: CLEAR_VEHICLE, payload: id });
+    dispatch({ type: CLEAR_VEHICLE, payload: vehicle });
   } catch (error) {
     console.log("Removing Vehicle Failed => ", error);
   }
 };
 
-export const getAllVehicles = (
-  clearVehicle,
-  setParkingInfo,
-  parkingInfo
-) => async dispatch => {
+export const updateParking = parkingData => async dispatch => {
+  let parkingRef = realTimeDB.ref("parkingLots/");
+
+  try {
+    await parkingRef.set(parkingData);
+    console.log("lots updated");
+  } catch (error) {
+    console.log("Parking lots are not updated => ", error);
+  }
+};
+
+export const getParkingLots = () => async dispatch => {
+  let parkingRef = realTimeDB.ref("parkingLots/");
+
+  try {
+    let snapshot = await parkingRef.once("value");
+    console.log("lots fetched");
+    dispatch({ type: SET_PARKING_LOTS, payload: snapshot.val() });
+  } catch (error) {
+    console.log("Parking lots are not set => ", error);
+  }
+};
+
+export const getAllVehicles = () => async dispatch => {
   // Getting vehicles collection reference
   let vehiclesRef = realTimeDB.ref("vehicles");
 
@@ -60,21 +84,13 @@ export const getAllVehicles = (
   try {
     let snapshot = await vehiclesRef.once("value");
 
-    // Setting loading to false
+    // // Setting loading to false
     dispatch(setLoading(false));
 
     // if some data is there
     if (snapshot.val()) {
       // Converting Object of objects into array of objects
       let vehiclesData = Object.values(snapshot.val());
-
-      // Setting timeouts on vehicles data received from firebase
-      vehiclesData = setVehiclesTimeout(
-        vehiclesData,
-        clearVehicle,
-        setParkingInfo,
-        parkingInfo
-      );
 
       // Setting the values in reducer
       dispatch({
@@ -88,12 +104,10 @@ export const getAllVehicles = (
   }
 };
 
-export const setParkingInfo = ({
-  LotsLength,
-  minTime,
-  limit
-}) => async dispatch => {
+export const setParkingInfo = () => async (dispatch, getState) => {
   let dbRef = realTimeDB.ref("/parking_info");
+
+  let { LotsLength, limit, minTime } = getState().vehicles;
 
   // Setting parking info into database
   try {
@@ -129,5 +143,48 @@ export const calMinTime = () => dispatch => dispatch({ type: CAL_MIN_TIME });
 
 const setLoading = flag => ({ type: SET_LOADING, payload: flag });
 
-export const setAuth = flag => dispatch =>
+export const setAuth = flag => async dispatch => {
+  let dbRef = realTimeDB.ref("/authentication");
+
+  try {
+    await dbRef.set({
+      isAuthenticated: flag
+    });
+  } catch (error) {
+    console.log("Setting Auth Failed => ", error);
+  }
+
   dispatch({ type: SET_AUTH, payload: flag });
+};
+
+export const getAuth = () => async dispatch => {
+  let dbRef = realTimeDB.ref("/authentication");
+
+  dispatch(setLoading(true));
+
+  try {
+    let snapshot = await dbRef.once("value");
+
+    if (snapshot.val()) {
+      dispatch({ type: SET_AUTH, payload: snapshot.val().isAuthenticated });
+    }
+  } catch (error) {
+    console.log("Getting Auth Failed => ", error);
+  }
+};
+
+export const setVehicleTimeout = (
+  data,
+  clearAction,
+  setParkingInfo,
+  parkingInfo
+) => async dispatch => {
+  let vehiclesData = setVehiclesTimeout(
+    data,
+    clearAction,
+    setParkingInfo,
+    parkingInfo
+  );
+
+  dispatch({ type: SET_VEHICLES_TIMEOUT, payload: vehiclesData });
+};

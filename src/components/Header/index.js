@@ -5,8 +5,6 @@ import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
 
-import Auth from "../../components/Auth/Auth";
-
 import { setAuth } from "../../actions";
 const useStyles = makeStyles(theme => ({
   root: {
@@ -21,18 +19,15 @@ const useStyles = makeStyles(theme => ({
 }));
 
 const Header = props => {
-  useEffect(() => {
-    console.log("Props in header => ", props);
-  });
   const classes = useStyles();
   return (
     <div className={classes.root}>
       <AppBar position="static">
         <Toolbar>
           <Typography variant="overline" className={classes.title}>
-            This is the headline
+            Parking System
           </Typography>
-          <Button component={Link} to="/vehicle/add" style={{ color: "#fff" }}>
+          <Button component={Link} to="/" style={{ color: "#fff" }}>
             Add Vehicle
           </Button>
           {props.isAuthenticated ? (
@@ -43,6 +38,13 @@ const Header = props => {
                 style={{ color: "#fff" }}
               >
                 Vehicle List
+              </Button>
+              <Button
+                component={Link}
+                to="/vehicle/parkingLots"
+                style={{ color: "#fff" }}
+              >
+                Parking Lots
               </Button>
 
               <Button

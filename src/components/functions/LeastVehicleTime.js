@@ -10,8 +10,5 @@ export default vehicles => {
     );
   });
 
-  // console.log("Vehicle Times => ", vehiclesTime);
-  // console.log("Minimum time => ", Math.min(...vehiclesTime));
-
   return Math.min(...vehiclesTime);
 };

@@ -7,8 +7,8 @@ import { setAuth } from "../../actions";
 
 const Admin = props => {
   const [credentials, setCredentials] = useState({
-    email: "",
-    password: ""
+    email: "test@gmail.com",
+    password: "home123456"
   });
 
   const [error, setError] = useState({});
@@ -20,17 +20,18 @@ const Admin = props => {
   const onSubmit = e => {
     e.preventDefault();
 
-    console.log(checkErrors());
+    // console.log(checkErrors());
 
     if (!checkErrors()) {
-      console.log("no errors");
+      // console.log("no errors");
       if (Auth.login(credentials.email, credentials.password)) {
-        console.log("login Successful");
-        console.log(props);
+        // console.log("login Successful");
+        // console.log(props);
         props.setAuth(true);
         props.history.push("/vehicle/list");
+        resetInputs();
       } else {
-        console.log(Auth.getErrors());
+        // console.log(Auth.getErrors());
 
         setError(Auth.getErrors());
       }
@@ -46,7 +47,7 @@ const Admin = props => {
 
     setError(errors);
 
-    console.log("Errors -> ", errors);
+    // console.log("Errors -> ", errors);
     return Object.keys(errors).length === 0 ? false : true;
   };
 
@@ -68,7 +69,7 @@ const Admin = props => {
           label="Email"
           onChange={onChange}
           value={credentials.email}
-          helperText="Email is compulsory"
+          helperText={error.email ? error.email : ""}
           fullWidth={true}
           margin="dense"
           variant="filled"
@@ -80,7 +81,7 @@ const Admin = props => {
           type="text"
           onChange={onChange}
           value={credentials.password}
-          helperText="Password is compulsory"
+          helperText={error.password ? error.password : ""}
           fullWidth={true}
           margin="dense"
           variant="filled"
@@ -94,7 +95,7 @@ const Admin = props => {
           variant="outlined"
           style={{ marginTop: 20 }}
         >
-          Submit
+          Login
         </Button>
       </form>
     </div>

@@ -1,6 +1,5 @@
-import firebase from "firebase";
-// import "firebase/auth";
-// import "firebase/firestore";
+import firebase from "firebase/app";
+import "firebase/database";
 
 const config = {
   apiKey: "AIzaSyBc2pKWwE22ItH6_me45-5mRxoQbNOb0Ms",
@@ -18,24 +17,3 @@ firebase.initializeApp(config);
 export const databaseRef = () => firebase.database();
 
 export default firebase;
-
-// // class Firebase extends Component {
-// //   constructor(props) {
-// //     super(props);
-// //     app.initializeApp(config);
-// //     this.auth = app.auth();
-// //     this.firestore = app.firestore();
-// //   }
-// //   doCreateUserWithEmailAndPassword = (email, password) =>
-// //     this.auth.createUserWithEmailAndPassword(email, password);
-
-// doSignInWithEmailAndPassword = (email, password) =>
-//   this.auth.signInWithEmailAndPassword(email, password);
-
-// //   doSignOut = () => this.auth.signOut();
-
-// //   doPasswordReset = email => this.auth.sendPasswordResetEmail(email);
-// //   doPasswordUpdate = password => this.auth.currentUser.updatePassword(password);
-// // }
-
-// // export default firebase;

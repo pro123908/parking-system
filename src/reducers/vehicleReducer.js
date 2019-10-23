@@ -7,37 +7,31 @@ import {
   GET_PARKING_INFO,
   SET_LIMIT,
   SET_LOADING,
-  SET_AUTH
+  SET_AUTH,
+  SET_VEHICLES_TIMEOUT,
+  SET_PARKING_LOTS
 } from "../actions/types";
 import { PARKING_LOTS_LIMIT } from "../config";
 import LeastVehicleTime from "../components/functions/LeastVehicleTime";
 
 const initialState = {
+  vehiclesLots: [],
   parkingLots: [
-    // {
-    //   driverName: "Bilal Ahmad",
-    //   registrationNumber: "32323f",
-    //   id: uuid.v4(),
-    //   timeout: true,
-    //   timer: setTimeout(() => {}, TIMER_FOR_PARKING_LOT * 1000),
-    //   time: new Date().getTime()
-    // },
-    // {
-    //   driverName: "Ahmad",
-    //   registrationNumber: "32323f",
-    //   id: uuid.v4(),
-    //   timeout: true,
-    //   timer: setTimeout(() => {}, TIMER_FOR_PARKING_LOT * 1000),
-    //   time: new Date().getTime() + 123232
-    // },
-    // {
-    //   driverName: "Bilal",
-    //   registrationNumber: "32323f",
-    //   id: uuid.v4(),
-    //   timeout: true,
-    //   timer: setTimeout(() => {}, TIMER_FOR_PARKING_LOT * 1000),
-    //   time: new Date().getTime() + 10000
-    // }
+    {
+      id: 1,
+      lot: "Parking Lot 1",
+      assigned: false
+    },
+    {
+      id: 2,
+      lot: "Parking Lot 2",
+      assigned: false
+    },
+    {
+      id: 3,
+      lot: "Parking Lot 3",
+      assigned: false
+    }
   ],
   LotsMax: PARKING_LOTS_LIMIT,
   LotsLength: 0,
@@ -45,13 +39,14 @@ const initialState = {
   minTime: false,
   loading: false,
   getParkingInfo: false,
+  getVehicles: false,
   isAuthenticated: false
 };
 
 const calculateMinTime = state => {
   let nextState = { ...state };
 
-  nextState.minTime = LeastVehicleTime(nextState.parkingLots);
+  nextState.minTime = LeastVehicleTime(nextState.vehiclesLots);
 
   return nextState;
 };
@@ -60,7 +55,7 @@ const setLimit = state => {
   let nextState = { ...state };
 
   nextState.limit = true;
-  nextState.minTime = LeastVehicleTime(nextState.parkingLots);
+  nextState.minTime = LeastVehicleTime(nextState.vehiclesLots);
 
   return nextState;
 };
@@ -69,8 +64,19 @@ const addVehicle = (state, action) => {
   action.payload.timeout = true;
 
   let nextState = { ...state };
+  let { parkingLots } = nextState;
 
-  nextState.parkingLots.push(action.payload);
+  let parkingIndex = parkingLots.findIndex(ele => ele.assigned === false);
+  if (parkingIndex !== -1) {
+    parkingLots[parkingIndex].name = action.payload.driverName;
+    parkingLots[parkingIndex].registrationNumber =
+      action.payload.registrationNumber;
+
+    parkingLots[parkingIndex].assigned = true;
+
+    nextState.vehiclesLots.push(action.payload);
+  }
+
   nextState.LotsLength++;
 
   return nextState;
@@ -78,12 +84,24 @@ const addVehicle = (state, action) => {
 
 const clearVehicle = (state, action) => {
   let nextState = { ...state };
-  let currentElement = nextState.parkingLots.findIndex(
-    ele => ele.id === action.payload
+  let { parkingLots } = nextState;
+  let currentElement = nextState.vehiclesLots.findIndex(
+    ele => ele.id === action.payload.id
   );
 
   if (currentElement !== -1) {
-    nextState.parkingLots.splice(currentElement, 1);
+    nextState.vehiclesLots.splice(currentElement, 1);
+    let parkingIndex = nextState.parkingLots.findIndex(
+      ele => ele.registrationNumber === action.payload.registrationNumber
+    );
+
+    if (parkingIndex !== -1) {
+      parkingLots[parkingIndex].name = "";
+      parkingLots[parkingIndex].registrationNumber = "";
+
+      parkingLots[parkingIndex].assigned = false;
+    }
+
     nextState.LotsLength--;
     nextState.minTime = false;
     nextState.limit = false;
@@ -95,7 +113,8 @@ const clearVehicle = (state, action) => {
 const getAllVehicles = (state, action) => {
   let nextState = { ...state };
 
-  nextState.parkingLots = action.payload;
+  nextState.vehiclesLots = action.payload;
+  nextState.getVehicles = true;
 
   return nextState;
 };
@@ -136,6 +155,21 @@ const setAuth = (state, action) => {
   return newState;
 };
 
+const setVehiclesTimeout = (state, action) => {
+  let newState = { ...state };
+
+  newState.vehiclesLots = action.payload;
+
+  return newState;
+};
+
+const setParkingLots = (state, action) => {
+  let newState = { ...state };
+  console.log("parkingltos =   ", action.payload);
+  newState.parkingLots = action.payload;
+  return newState;
+};
+
 export default (state = initialState, action) => {
   switch (action.type) {
     case ADD_VEHICLE:
@@ -164,6 +198,12 @@ export default (state = initialState, action) => {
 
     case SET_AUTH:
       return setAuth(state, action);
+
+    case SET_VEHICLES_TIMEOUT:
+      return setVehiclesTimeout(state, action);
+
+    case SET_PARKING_LOTS:
+      return setParkingLots(state, action);
 
     default:
       return state;

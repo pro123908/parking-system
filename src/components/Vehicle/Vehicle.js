@@ -27,7 +27,6 @@ const Vehicle = ({ vehicle }) => {
 
     // clear interval on re-render to avoid memory leaks
     return () => {
-      // console.log("Clearing id ", intervalId);
       clearInterval(intervalId);
     };
     // add timeLeft as a dependency to re-rerun the effect

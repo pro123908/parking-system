@@ -1,12 +1,13 @@
 import React from "react";
 import { Route, Redirect } from "react-router-dom";
-import Auth from "../Auth/Auth";
 
-const PrivateRoute = ({ component: Component, ...rest }) => (
+import { connect } from "react-redux";
+
+const NonAuthRoute = ({ component: Component, isAuthenticated, ...rest }) => (
   <Route
     {...rest}
     render={props =>
-      !Auth.isAuthenticated() ? (
+      !isAuthenticated ? (
         <Component {...props} />
       ) : (
         <Redirect to={{ pathname: "/vehicle/list" }} />
@@ -15,4 +16,10 @@ const PrivateRoute = ({ component: Component, ...rest }) => (
   />
 );
 
-export default PrivateRoute;
+const mapStateToProps = state => {
+  return {
+    isAuthenticated: state.vehicles.isAuthenticated
+  };
+};
+
+export default connect(mapStateToProps)(NonAuthRoute);

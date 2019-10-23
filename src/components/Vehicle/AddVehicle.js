@@ -27,10 +27,8 @@ const AddVehicle = props => {
 
   const [minTimer, setMinTimer] = useState(null);
 
-  const [dialogTimer, setDialogTimer] = useState(5);
-
   const minCounter = () => {
-    if (props.vehicles.limit && open) {
+    if (props.vehicles.limit) {
       // Setting the timer for the first time
       if (minTimer === null) setMinTimer(props.vehicles.minTime);
 
@@ -54,78 +52,54 @@ const AddVehicle = props => {
 
       // clear interval on re-render to avoid memory leaks
       return () => {
-        // console.log("Clearing id ", intervalId);
         clearInterval(intervalId);
       };
     }
   };
 
-  const dialogCounter = () => {
-    // Returning empty function if timer has been ended
-    if (dialogTimer === 0) {
-      modalClose();
-      // console.log("closing");
-      return () => {};
-    }
-    const intervalId = setInterval(() => {
-      setDialogTimer(dialogTimer - 1);
-    }, 1000);
-
-    // clear interval on re-render to avoid memory leaks
-    return () => {
-      // console.log("Clearing id ", intervalId);
-      clearInterval(intervalId);
-    };
-  };
-
   useEffect(() => {
+    console.log("timer useEffect => ", props.vehicles.limit);
     if (props.vehicles.limit) {
       return minCounter();
     }
 
     return () => {};
-  }, [props, minTimer]);
-
-  useEffect(() => {
-    if (open) {
-      // console.log("caled");
-      return dialogCounter();
-    }
-  }, [open, dialogTimer]);
+  }, [props.vehicles.limit, minTimer]);
 
   const resetInputs = () => {
     setVehicle({ driverName: "", registrationNumber: "" });
   };
 
-  const onSubmit = e => {
+  const onSubmit = async e => {
     e.preventDefault();
 
     if (vehicle.driverName && vehicle.registrationNumber) {
-      let { LotsLength, LotsMax, minTime, limit } = props.vehicles;
+      let { LotsLength, LotsMax } = props.vehicles;
 
       if (LotsLength < LotsMax) {
         // Giving unique ID to the vehicle
         vehicle.id = v4();
 
         // Attaching timeout function to the vehicle
-        vehicle.timer = setTimeout(() => {
-          // console.log(`Timer for driver ${vehicle.driverName} expired`);
+        vehicle.timer = setTimeout(async () => {
+          if (vehicle.timeout) {
+            await props.clearVehicle(vehicle);
 
-          if (vehicle.timeout) props.clearVehicle(vehicle.id);
+            props.setParkingInfo();
+          }
         }, TIMER_FOR_PARKING_LOT * 1000);
 
         vehicle.time = new Date().getTime();
 
         // Adding vehicle to the parkingLot
 
-        props.addVehicle(vehicle, props.vehicles);
+        await props.addVehicle(vehicle, props.vehicles);
 
-        props.setParkingInfo({ LotsLength: LotsLength + 1, limit, minTime });
+        props.setParkingInfo();
 
         // Displaying success modal text
         dialogTextString("success");
       } else {
-        console.log("limit");
         props.setLimit();
       }
 
@@ -230,7 +204,7 @@ const AddVehicle = props => {
           variant="outlined"
           style={{ marginTop: 20 }}
         >
-          Submit
+          Add Vehicle
         </Button>
       </form>
 

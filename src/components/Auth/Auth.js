@@ -1,13 +1,10 @@
-import React, { Component } from "react";
-import { connect } from "react-redux";
-
-import { setAuth } from "../../actions";
+import { Component } from "react";
 
 class Auth extends Component {
   constructor(props) {
     super(props);
 
-    this.email = "pro123908@gmail.com";
+    this.email = "test@gmail.com";
     this.password = "home123456";
     this.authenticated = false;
     this.errors = {};
