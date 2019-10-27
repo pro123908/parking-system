@@ -1,17 +1,21 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Button, TextField, Typography } from "@material-ui/core";
-import Auth from "./Auth";
+
 import { connect } from "react-redux";
 
 import { setAuth } from "../../actions";
 
-const Admin = props => {
+const Admin = ({ auth, setAuth, history }) => {
   const [credentials, setCredentials] = useState({
-    email: "test@gmail.com",
-    password: "home123456"
+    email: "",
+    password: ""
   });
 
-  const [error, setError] = useState({});
+  const [errors, setErrors] = useState({});
+
+  useEffect(() => {
+    setCredentials({ email: auth.email, password: auth.password });
+  }, []);
 
   const resetInputs = () => {
     setCredentials({ email: "", password: "" });
@@ -20,40 +24,32 @@ const Admin = props => {
   const onSubmit = e => {
     e.preventDefault();
 
-    // console.log(checkErrors());
-
-    if (!checkErrors()) {
-      // console.log("no errors");
-      if (Auth.login(credentials.email, credentials.password)) {
-        // console.log("login Successful");
-        // console.log(props);
-        props.setAuth(true);
-        props.history.push("/vehicle/list");
-        resetInputs();
-      } else {
-        // console.log(Auth.getErrors());
-
-        setError(Auth.getErrors());
-      }
+    if (validate()) {
+      setAuth(true);
+      history.push("/vehicle/list");
+      resetInputs();
     }
   };
 
-  const checkErrors = () => {
-    const errors = {};
+  const validate = () => {
+    let errors = {};
 
     if (!credentials.email) errors.email = "Email is required";
+    else if (credentials.email !== auth.email)
+      errors.email = "Email is Invalid";
 
     if (!credentials.password) errors.password = "Password is required";
+    else if (credentials.password !== auth.password)
+      errors.password = "Wrong Password";
 
-    setError(errors);
+    setErrors(errors);
 
-    // console.log("Errors -> ", errors);
-    return Object.keys(errors).length === 0 ? false : true;
+    return Object.keys(errors).length === 0 ? true : false;
   };
 
   const onChange = e => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
-    setError({ ...error, [e.target.name]: null });
+    setErrors({ ...errors, [e.target.name]: null });
   };
 
   return (
@@ -69,11 +65,11 @@ const Admin = props => {
           label="Email"
           onChange={onChange}
           value={credentials.email}
-          helperText={error.email ? error.email : ""}
+          helperText={errors.email ? errors.email : ""}
           fullWidth={true}
           margin="dense"
           variant="filled"
-          error={error.email ? true : false}
+          error={errors.email ? true : false}
         />
         <TextField
           name="password"
@@ -81,11 +77,11 @@ const Admin = props => {
           type="text"
           onChange={onChange}
           value={credentials.password}
-          helperText={error.password ? error.password : ""}
+          helperText={errors.password ? errors.password : ""}
           fullWidth={true}
           margin="dense"
           variant="filled"
-          error={error.password ? true : false}
+          error={errors.password ? true : false}
         />
 
         <Button
@@ -102,7 +98,13 @@ const Admin = props => {
   );
 };
 
+const mapStateToProps = state => {
+  return {
+    auth: state.auth
+  };
+};
+
 export default connect(
-  null,
+  mapStateToProps,
   { setAuth }
 )(Admin);

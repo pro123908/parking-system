@@ -4,6 +4,9 @@ import { Button, TextField, Typography } from "@material-ui/core";
 import { connect } from "react-redux";
 
 import CustomDialog from "../Dialogs";
+
+import setDialogTextString from "../functions/setDialogTextString";
+
 import { TIMER_FOR_PARKING_LOT } from "../../config";
 import {
   addVehicle,
@@ -11,10 +14,13 @@ import {
   calMinTime,
   setParkingInfo,
   setLimit
-} from "../../actions";
-import TimeFormat from "../functions/TimeFormat";
+} from "../../actions/";
+
+import Styles from "../styles";
 
 const AddVehicle = props => {
+  const classes = Styles();
+
   const [vehicle, setVehicle] = useState({
     driverName: "",
     registrationNumber: ""
@@ -27,44 +33,44 @@ const AddVehicle = props => {
 
   const [minTimer, setMinTimer] = useState(null);
 
+  const [expireTimer, setTimerExpired] = useState(false);
+
   const minCounter = () => {
-    if (props.vehicles.limit) {
-      // Setting the timer for the first time
-      if (minTimer === null) setMinTimer(props.vehicles.minTime);
-
-      // Returning empty function if timer has been ended
-      if (minTimer === 0) {
-        console.log("Timer => 0");
-        if (open) {
-          modalClose();
-          dialogTextString("available");
-          modalOpen();
-        }
-        return () => {};
-      }
-      const intervalId = setInterval(() => {
-        setMinTimer(minTimer - 1);
-      }, 1000);
-
-      // console.log(intervalId);
-
-      dialogTextString("failure");
-
-      // clear interval on re-render to avoid memory leaks
-      return () => {
-        clearInterval(intervalId);
-      };
+    // Setting the timer for the first time
+    if (minTimer === null) {
+      setMinTimer(props.vehicles.minTime);
     }
+
+    // Returning empty function if timer has been ended
+    if (minTimer === 0) {
+      setTimerExpired(false);
+
+      if (open) {
+        modalClose();
+        setDialogText(setDialogTextString("available"));
+        modalOpen();
+      }
+      return () => {};
+    }
+    const intervalId = setInterval(() => {
+      setMinTimer(minTimer - 1);
+    }, 1000);
+
+    // console.log(intervalId);
+
+    setDialogText(setDialogTextString("failure", minTimer));
+
+    // clear interval on re-render to avoid memory leaks
+    return () => {
+      clearInterval(intervalId);
+    };
   };
 
   useEffect(() => {
-    console.log("timer useEffect => ", props.vehicles.limit);
-    if (props.vehicles.limit) {
+    if (expireTimer) {
       return minCounter();
     }
-
-    return () => {};
-  }, [props.vehicles.limit, minTimer]);
+  }, [minTimer]);
 
   const resetInputs = () => {
     setVehicle({ driverName: "", registrationNumber: "" });
@@ -73,34 +79,41 @@ const AddVehicle = props => {
   const onSubmit = async e => {
     e.preventDefault();
 
+    // If fields are filled
     if (vehicle.driverName && vehicle.registrationNumber) {
-      let { LotsLength, LotsMax } = props.vehicles;
+      let { limit } = props.vehicles;
 
-      if (LotsLength < LotsMax) {
+      // If all lots are not booked
+      if (!limit) {
         // Giving unique ID to the vehicle
         vehicle.id = v4();
 
-        // Attaching timeout function to the vehicle
-        vehicle.timer = setTimeout(async () => {
-          if (vehicle.timeout) {
-            await props.clearVehicle(vehicle);
+        // Placing timestamp on the vehicle
+        vehicle.time = new Date().getTime();
 
+        // Adding vehicle to the parkingLot
+        await props.addVehicle(vehicle);
+
+        // Setting parkingInfo after the vehicle was added
+        props.setParkingInfo();
+
+        // Attaching parking timeout function to the vehicle
+        vehicle.timer = setTimeout(async () => {
+          // If vehicle was added successfully
+          if (vehicle.timeout) {
+            // Clearing the vehicle parking on timeout
+            await props.clearVehicle(vehicle);
+            // Setting the parkingInfo after the clearing vehicle
             props.setParkingInfo();
           }
         }, TIMER_FOR_PARKING_LOT * 1000);
 
-        vehicle.time = new Date().getTime();
-
-        // Adding vehicle to the parkingLot
-
-        await props.addVehicle(vehicle, props.vehicles);
-
-        props.setParkingInfo();
-
-        // Displaying success modal text
-        dialogTextString("success");
+        // Displaying success modal text on vehicle addition
+        setDialogText(setDialogTextString("success"));
       } else {
-        props.setLimit();
+        // No parking lots available so setting timer
+        setTimerExpired(true);
+        setMinTimer(props.vehicles.minTime);
       }
 
       // Resetting all the inputs
@@ -131,27 +144,6 @@ const AddVehicle = props => {
   const onChange = e => {
     setVehicle({ ...vehicle, [e.target.name]: e.target.value });
     setError({ ...error, [e.target.name]: null });
-  };
-
-  const dialogTextString = type => {
-    if (type === "success") {
-      setDialogText({
-        title: "Parking Information",
-        description: "You have been alloted a parking space!"
-      });
-    } else if (type === "failure") {
-      setDialogText({
-        title: "Parking Information",
-        description: `No parking space available at this moment! Next parking lot will be available in ${TimeFormat(
-          minTimer * 1000
-        )}`
-      });
-    } else if (type === "available") {
-      setDialogText({
-        title: "Parking Information",
-        description: `Parking Space is now available`
-      });
-    }
   };
 
   const displayDialog = () => {
@@ -202,7 +194,7 @@ const AddVehicle = props => {
           color="primary"
           fullWidth={true}
           variant="outlined"
-          style={{ marginTop: 20 }}
+          className={`${classes.mt20}`}
         >
           Add Vehicle
         </Button>

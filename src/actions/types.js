@@ -17,3 +17,5 @@ export const GET_AUTH = "GET_AUTH";
 export const SET_VEHICLES_TIMEOUT = "SET_VEHICLES_TIMEOUT";
 
 export const SET_PARKING_LOTS = "SET_PARKING_LOTS";
+
+export const SET_LOGIN = "SET_LOGIN";

@@ -8,6 +8,7 @@ import {
   DialogContentText
 } from "@material-ui/core";
 
+// Dialog component for displaying the dialog
 const CustomDialog = ({ open, modalClose, title, description }) => (
   <Dialog open={open} color="primary">
     <DialogTitle>{title}</DialogTitle>

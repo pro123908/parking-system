@@ -14,8 +14,6 @@ const Vehicle = ({ vehicle }) => {
     TIMER_FOR_PARKING_LOT -
     Math.round((new Date().getTime() - vehicle.time) / 1000);
 
-  // console.log("vehicle time => ", vehicleTime);
-
   const [timeLeft, setTimeLeft] = useState(vehicleTime);
 
   useEffect(() => {

@@ -1,6 +1,7 @@
 import firebase from "firebase/app";
 import "firebase/database";
 
+// Firebase configuration
 const config = {
   apiKey: "AIzaSyBc2pKWwE22ItH6_me45-5mRxoQbNOb0Ms",
   authDomain: "parking-system-3acb7.firebaseapp.com",
@@ -12,8 +13,7 @@ const config = {
   measurementId: "G-6BL3GZSZ0C"
 };
 
+// Initializing the firebase Application
 firebase.initializeApp(config);
-
-export const databaseRef = () => firebase.database();
 
 export default firebase;

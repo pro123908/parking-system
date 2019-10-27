@@ -1,18 +1,12 @@
 import React from "react";
 import { connect } from "react-redux";
-import { List, CircularProgress } from "@material-ui/core";
+import { List } from "@material-ui/core";
 import ParkingLot from "./ParkingLot";
 
-const ParkingLots = ({ parkingLots, loading }) => {
+const ParkingLots = ({ parkingLots }) => {
   let parkingContent = "";
 
-  if (loading) {
-    parkingContent = (
-      <div style={{ textAlign: "center" }}>
-        <CircularProgress color="primary" variant="determinate" />
-      </div>
-    );
-  } else if (parkingLots.length > 0) {
+  if (parkingLots.length > 0) {
     parkingContent = parkingLots.map(vehicle => (
       <ParkingLot key={vehicle.id} vehicle={vehicle} />
     ));

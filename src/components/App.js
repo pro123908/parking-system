@@ -7,22 +7,27 @@ import VehiclesList from "./Vehicle/VehiclesList";
 import Header from "./Header";
 import { connect } from "react-redux";
 import { CircularProgress } from "@material-ui/core";
+import { makeStyles } from "@material-ui/core/styles";
 import {
   getAllVehicles,
   clearVehicle,
   setParkingInfo,
   getParkingInfo,
-  getAuth,
   setVehicleTimeout,
   updateParking,
-  getParkingLots
-} from "../actions";
+  getParkingLots,
+  getAuth
+} from "../actions/";
+
 import Admin from "./Auth/Admin";
 import PrivateRoute from "../components/Auth/PrivateRoute";
 import NonAuthRoute from "../components/Auth/NonAuthRoute";
 import ParkingLots from "./Vehicle/ParkingLots";
 
+import Styles from "./styles";
+
 const App = props => {
+  const classes = Styles();
   let {
     getAuth,
     getParkingInfo,
@@ -35,33 +40,37 @@ const App = props => {
     getParkingLots
   } = props;
   useEffect(() => {
+    // Getting the Auth Status from firebase
     getAuth();
+
+    // Getting the parking lots status from firebase
     getParkingLots();
 
+    // Getting the parking info status from firebase
     getParkingInfo();
+
+    // Getting all the vehicles parked from firebase
     getAllVehicles();
   }, []);
 
   useEffect(() => {
+    // If all vehicles are fetched then setTimeout on all of them
     if (vehicles.getVehicles) {
       setVehicleTimeout(vehicles.vehiclesLots, clearVehicle, setParkingInfo);
     }
   }, [vehicles.getVehicles]);
 
   useEffect(() => {
-    if (vehicles.getParkingInfo) setParkingInfo(props.vehicles);
-  }, [vehicles.limit]);
-
-  useEffect(() => {
+    // Updating the parkingLots on firebase whenever the lots length changes
     if (vehicles.getParkingInfo) updateParking(vehicles.parkingLots);
   }, [vehicles.LotsLength]);
 
   return (
-    <div style={styles}>
+    <div className={classes.font}>
       {!props.vehicles.loading ? (
         <BrowserRouter>
           <Header />
-          <Container style={{ marginTop: 20 }}>
+          <Container className={classes.mt20}>
             <Route exact path="/" component={AddVehicle} />
 
             <PrivateRoute path="/vehicle/list" component={VehiclesList} />
@@ -71,7 +80,7 @@ const App = props => {
           </Container>
         </BrowserRouter>
       ) : (
-        <div style={{ textAlign: "center", marginTop: "45%" }}>
+        <div className={classes.loaderStyles}>
           <CircularProgress color="primary" />
         </div>
       )}

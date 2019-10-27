@@ -7,7 +7,6 @@ import {
   GET_PARKING_INFO,
   SET_LIMIT,
   SET_LOADING,
-  SET_AUTH,
   SET_VEHICLES_TIMEOUT,
   SET_PARKING_LOTS
 } from "../actions/types";
@@ -39,13 +38,21 @@ const initialState = {
   minTime: false,
   loading: false,
   getParkingInfo: false,
-  getVehicles: false,
-  isAuthenticated: false
+  getVehicles: false
 };
 
 const calculateMinTime = state => {
   let nextState = { ...state };
 
+  nextState.minTime = LeastVehicleTime(nextState.vehiclesLots);
+
+  return nextState;
+};
+
+const setLimitTemp = state => {
+  let nextState = { ...state };
+
+  nextState.limit = true;
   nextState.minTime = LeastVehicleTime(nextState.vehiclesLots);
 
   return nextState;
@@ -76,8 +83,11 @@ const addVehicle = (state, action) => {
 
     nextState.vehiclesLots.push(action.payload);
   }
-
   nextState.LotsLength++;
+
+  if (nextState.LotsLength === nextState.LotsMax) {
+    nextState = setLimit(nextState);
+  }
 
   return nextState;
 };
@@ -147,14 +157,6 @@ const setLoading = (state, action) => {
   return newState;
 };
 
-const setAuth = (state, action) => {
-  let newState = { ...state };
-
-  newState.isAuthenticated = action.payload;
-
-  return newState;
-};
-
 const setVehiclesTimeout = (state, action) => {
   let newState = { ...state };
 
@@ -191,13 +193,10 @@ export default (state = initialState, action) => {
       return getParkingInfo(state, action);
 
     case SET_LIMIT:
-      return setLimit(state, action);
+      return setLimitTemp(state, action);
 
     case SET_LOADING:
       return setLoading(state, action);
-
-    case SET_AUTH:
-      return setAuth(state, action);
 
     case SET_VEHICLES_TIMEOUT:
       return setVehiclesTimeout(state, action);

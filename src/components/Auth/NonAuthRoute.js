@@ -18,7 +18,7 @@ const NonAuthRoute = ({ component: Component, isAuthenticated, ...rest }) => (
 
 const mapStateToProps = state => {
   return {
-    isAuthenticated: state.vehicles.isAuthenticated
+    isAuthenticated: state.auth.authenticated
   };
 };
 

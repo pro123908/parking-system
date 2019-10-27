@@ -1,25 +1,14 @@
-import React, { useEffect } from "react";
+import React from "react";
 import { makeStyles } from "@material-ui/core/styles";
 import { AppBar, Toolbar, Typography, Button } from "@material-ui/core";
 import { Link } from "react-router-dom";
 import { connect } from "react-redux";
 import { withRouter } from "react-router-dom";
-
+import Styles from "../styles";
 import { setAuth } from "../../actions";
-const useStyles = makeStyles(theme => ({
-  root: {
-    flexGrow: 1
-  },
-  menuButton: {
-    marginRight: theme.spacing(2)
-  },
-  title: {
-    flexGrow: 1
-  }
-}));
 
 const Header = props => {
-  const classes = useStyles();
+  const classes = Styles();
   return (
     <div className={classes.root}>
       <AppBar position="static">
@@ -27,7 +16,7 @@ const Header = props => {
           <Typography variant="overline" className={classes.title}>
             Parking System
           </Typography>
-          <Button component={Link} to="/" style={{ color: "#fff" }}>
+          <Button component={Link} to="/" className={classes.white}>
             Add Vehicle
           </Button>
           {props.isAuthenticated ? (
@@ -35,14 +24,14 @@ const Header = props => {
               <Button
                 component={Link}
                 to="/vehicle/list"
-                style={{ color: "#fff" }}
+                className={classes.white}
               >
                 Vehicle List
               </Button>
               <Button
                 component={Link}
                 to="/vehicle/parkingLots"
-                style={{ color: "#fff" }}
+                className={classes.white}
               >
                 Parking Lots
               </Button>
@@ -52,13 +41,13 @@ const Header = props => {
                   props.setAuth(false);
                   props.history.push("/admin");
                 }}
-                style={{ color: "#fff" }}
+                className={classes.white}
               >
                 Logout
               </Button>
             </React.Fragment>
           ) : (
-            <Button component={Link} to="/admin" style={{ color: "#fff" }}>
+            <Button component={Link} to="/admin" className={classes.white}>
               Admin View
             </Button>
           )}
@@ -70,7 +59,7 @@ const Header = props => {
 
 const mapStateToProps = state => {
   return {
-    isAuthenticated: state.vehicles.isAuthenticated
+    isAuthenticated: state.auth.authenticated
   };
 };
 
