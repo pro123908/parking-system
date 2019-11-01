@@ -11,9 +11,9 @@ import { TIMER_FOR_PARKING_LOT } from "../../config";
 import {
   addVehicle,
   clearVehicle,
-  calMinTime,
   setParkingInfo,
-  setLimit
+  setLimit,
+  calculateMinTime
 } from "../../actions/";
 
 import Styles from "../styles";
@@ -113,6 +113,8 @@ const AddVehicle = props => {
       } else {
         // No parking lots available so setting timer
         setTimerExpired(true);
+        console.log(props.vehicles.minTime);
+        await props.calculateMinTime();
         setMinTimer(props.vehicles.minTime);
       }
 
@@ -213,5 +215,12 @@ const mapStateToProps = state => {
 
 export default connect(
   mapStateToProps,
-  { addVehicle, clearVehicle, calMinTime, setParkingInfo, setLimit }
+  {
+    addVehicle,
+    clearVehicle,
+
+    setParkingInfo,
+    setLimit,
+    calculateMinTime
+  }
 )(AddVehicle);

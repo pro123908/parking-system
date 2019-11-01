@@ -7,7 +7,6 @@ import VehiclesList from "./Vehicle/VehiclesList";
 import Header from "./Header";
 import { connect } from "react-redux";
 import { CircularProgress } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
 import {
   getAllVehicles,
   clearVehicle,

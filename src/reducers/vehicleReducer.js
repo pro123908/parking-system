@@ -125,6 +125,7 @@ const getAllVehicles = (state, action) => {
 
   nextState.vehiclesLots = action.payload;
   nextState.getVehicles = true;
+  nextState.minTime = LeastVehicleTime(nextState.vehiclesLots);
 
   return nextState;
 };

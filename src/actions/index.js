@@ -14,7 +14,7 @@ import {
   getParkingLots
 } from "./parkingActions";
 
-import { setLimit, calMinTime } from "./miscellaneousActions";
+import { setLimit, calculateMinTime } from "./miscellaneousActions";
 
 export {
   addVehicle,
@@ -28,5 +28,5 @@ export {
   getParkingInfo,
   getParkingLots,
   setLimit,
-  calMinTime
+  calculateMinTime
 };
