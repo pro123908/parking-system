@@ -13,17 +13,17 @@ import {
   clearVehicle,
   setParkingInfo,
   setLimit,
-  calculateMinTime
+  calculateMinTime,
 } from "../../actions/";
 
 import Styles from "../styles";
 
-const AddVehicle = props => {
+const AddVehicle = (props) => {
   const classes = Styles();
 
   const [vehicle, setVehicle] = useState({
     driverName: "",
-    registrationNumber: ""
+    registrationNumber: "",
   });
   const [error, setError] = useState({});
 
@@ -76,7 +76,7 @@ const AddVehicle = props => {
     setVehicle({ driverName: "", registrationNumber: "" });
   };
 
-  const onSubmit = async e => {
+  const onSubmit = async (e) => {
     e.preventDefault();
 
     // If fields are filled
@@ -143,7 +143,7 @@ const AddVehicle = props => {
 
   const modalClose = () => setOpen(false);
 
-  const onChange = e => {
+  const onChange = (e) => {
     setVehicle({ ...vehicle, [e.target.name]: e.target.value });
     setError({ ...error, [e.target.name]: null });
   };
@@ -160,7 +160,7 @@ const AddVehicle = props => {
   };
 
   return (
-    <div>
+    <div style={{ width: "50%", margin: "0 auto" }}>
       <Typography variant="h5" color="primary">
         Add a vehicle
       </Typography>
@@ -174,7 +174,8 @@ const AddVehicle = props => {
           value={vehicle.driverName}
           helperText="Driver Name is compulsory"
           fullWidth={true}
-          margin="dense"
+          // margin="dense"
+          className={classes.mb20}
           variant="filled"
           error={error.driverName ? true : false}
         />
@@ -186,7 +187,7 @@ const AddVehicle = props => {
           value={vehicle.registrationNumber}
           helperText="Registration Number is compulsory"
           fullWidth={true}
-          margin="dense"
+          // margin="dense"
           variant="filled"
           error={error.registrationNumber ? true : false}
         />
@@ -207,20 +208,17 @@ const AddVehicle = props => {
   );
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    vehicles: state.vehicles
+    vehicles: state.vehicles,
   };
 };
 
-export default connect(
-  mapStateToProps,
-  {
-    addVehicle,
-    clearVehicle,
+export default connect(mapStateToProps, {
+  addVehicle,
+  clearVehicle,
 
-    setParkingInfo,
-    setLimit,
-    calculateMinTime
-  }
-)(AddVehicle);
+  setParkingInfo,
+  setLimit,
+  calculateMinTime,
+})(AddVehicle);

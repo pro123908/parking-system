@@ -97,16 +97,13 @@ const mapStateToProps = state => {
   };
 };
 
-export default connect(
-  mapStateToProps,
-  {
-    getAllVehicles,
-    clearVehicle,
-    setParkingInfo,
-    getParkingInfo,
-    getAuth,
-    setVehicleTimeout,
-    updateParking,
-    getParkingLots
-  }
-)(App);
+export default connect(mapStateToProps, {
+  getAllVehicles,
+  clearVehicle,
+  setParkingInfo,
+  getParkingInfo,
+  getAuth,
+  setVehicleTimeout,
+  updateParking,
+  getParkingLots
+})(App);

@@ -8,7 +8,7 @@ import { setAuth } from "../../actions";
 const Admin = ({ auth, setAuth, history }) => {
   const [credentials, setCredentials] = useState({
     email: "",
-    password: ""
+    password: "",
   });
 
   const [errors, setErrors] = useState({});
@@ -21,7 +21,7 @@ const Admin = ({ auth, setAuth, history }) => {
     setCredentials({ email: "", password: "" });
   };
 
-  const onSubmit = e => {
+  const onSubmit = (e) => {
     e.preventDefault();
 
     if (validate()) {
@@ -47,13 +47,13 @@ const Admin = ({ auth, setAuth, history }) => {
     return Object.keys(errors).length === 0 ? true : false;
   };
 
-  const onChange = e => {
+  const onChange = (e) => {
     setCredentials({ ...credentials, [e.target.name]: e.target.value });
     setErrors({ ...errors, [e.target.name]: null });
   };
 
   return (
-    <div>
+    <div style={{ width: "50%", margin: "0 auto" }}>
       <Typography variant="h5" color="primary">
         Admin Login
       </Typography>
@@ -98,13 +98,10 @@ const Admin = ({ auth, setAuth, history }) => {
   );
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    auth: state.auth
+    auth: state.auth,
   };
 };
 
-export default connect(
-  mapStateToProps,
-  { setAuth }
-)(Admin);
+export default connect(mapStateToProps, { setAuth })(Admin);

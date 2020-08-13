@@ -7,7 +7,7 @@ import { withRouter } from "react-router-dom";
 import Styles from "../styles";
 import { setAuth } from "../../actions";
 
-const Header = props => {
+const Header = (props) => {
   const classes = Styles();
   return (
     <div className={classes.root}>
@@ -17,7 +17,7 @@ const Header = props => {
             Parking System
           </Typography>
           <Button component={Link} to="/" className={classes.white}>
-            Add Vehicle
+            Park Vehicle
           </Button>
           {props.isAuthenticated ? (
             <React.Fragment>
@@ -26,7 +26,7 @@ const Header = props => {
                 to="/vehicle/list"
                 className={classes.white}
               >
-                Vehicle List
+                Park Vehicles List
               </Button>
               <Button
                 component={Link}
@@ -57,15 +57,10 @@ const Header = props => {
   );
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    isAuthenticated: state.auth.authenticated
+    isAuthenticated: state.auth.authenticated,
   };
 };
 
-export default withRouter(
-  connect(
-    mapStateToProps,
-    { setAuth }
-  )(Header)
-);
+export default withRouter(connect(mapStateToProps, { setAuth })(Header));

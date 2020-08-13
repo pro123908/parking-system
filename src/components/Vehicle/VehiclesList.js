@@ -3,23 +3,27 @@ import Vehicle from "./Vehicle";
 import { List } from "@material-ui/core";
 import { connect } from "react-redux";
 
-const VehiclesList = props => {
+const VehiclesList = (props) => {
   let vehicleContent = "";
 
   if (props.vehicles.vehiclesLots.length > 0) {
-    vehicleContent = props.vehicles.vehiclesLots.map(vehicle => (
+    vehicleContent = props.vehicles.vehiclesLots.map((vehicle) => (
       <Vehicle key={vehicle.id} vehicle={vehicle} />
     ));
   } else {
-    vehicleContent = <h3 style={{ textAlign: "center" }}>No Vehicle Found</h3>;
+    vehicleContent = (
+      <h3 style={{ textAlign: "center", textTransform: "uppercase" }}>
+        No vehicles are parked, Park a vehicle to start
+      </h3>
+    );
   }
 
   return <List>{vehicleContent}</List>;
 };
 
-const mapStateToProps = state => {
+const mapStateToProps = (state) => {
   return {
-    vehicles: state.vehicles
+    vehicles: state.vehicles,
   };
 };
 
